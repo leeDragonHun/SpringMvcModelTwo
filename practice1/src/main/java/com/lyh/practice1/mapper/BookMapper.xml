@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 어떤 mapper와 연결되어 있는지 경로 설정 -->
+<mapper namespace="com.lyh.practice1.mapper.BookMapper">
+    <!-- id는 매퍼 메서드 이름 (인터페이스의 메서드와 일치) -->
+    <!-- resultType은 쿼리 결과를 매핑할 객체 타입.(그러므로 select문에나 쓰이겠다) -->
+    <!-- parameterType은 #{} 표현식에 사용할 매개변수 타입 -->
+    <!-- 도서 목록 출력 + 표지 출력(표지없어도 출력) -->
+	<select id="selectList" resultType="map" parameterType="map">
+		SELECT
+			b.book_no AS bookNo, 
+			b.book_title AS bookTitle, 
+			b.book_writer AS bookWriter, 
+			bi.img_name AS imgName, 
+			bi.img_no AS imgNo
+		FROM
+			book AS b LEFT JOIN book_img AS bi
+		ON
+			b.book_no = bi.book_no
+		ORDER BY
+			bookNo DESC
+		LIMIT
+			#{beginRow}, #{rowPerPage}
+	</select>
+	
+	<!-- 도서 목록 갯수 -->
+	<select id="listCnt" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM
+			book
+	</select>
+	
+	<!-- 도서 추가 -->
+	<insert id="insert" parameterType="com.lyh.practice1.dto.Book">
+		<!-- <selectKey> 태그 : 삽입된 행의 키 값을 검색하기 위해 사용 -->
+		<!-- order="AFTER" : insert 문이 실행된 후에 이 쿼리를 실행하겠다 -->
+		<!-- keyProperty="bookNo" : Book 객체의 bookNo 필드에 삽입된 값으로... -->
+		<!-- resultType="int" : 반환되는 키 값의 타입이 int임을 지정 -->
+		<!-- SELECT LAST_INSERT_ID() : 최근에 삽입된 행의 자동 증가(AUTO_INCREMENT)된 ID 값을 반환 -->
+		<selectKey order="AFTER" keyProperty="bookNo" resultType="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		
+		INSERT INTO book (
+			book_title, 
+			book_writer
+		) VALUES (
+			#{bookTitle},
+			#{bookWriter}
+		)		
+	</insert>
+	
+	<!-- 도서 한권 상세보기 --> 
+	<select id="selectOne" resultType="map" parameterType="map">
+		SELECT
+			b.book_no AS bookNo, 
+			b.book_title AS bookTitle, 
+			b.book_writer AS bookWriter, 
+			bi.img_name AS imgName, 
+			bi.img_no AS imgNo
+		FROM
+			book AS b LEFT JOIN book_img AS bi
+		ON
+			b.book_no = bi.book_no
+		WHERE
+			b.book_no = #{bookNo}
+	</select>
+	
+	<!-- 도서 삭제 -->
+	<delete id="delete" parameterType="com.lyh.practice1.dto.BookUpdateRequest">
+		DELETE FROM book WHERE book_no = #{bookNo}
+	</delete>
+	
+	<!-- 도서 수정(제목과 작가만) -->
+	<update id="update" parameterType="com.lyh.practice1.dto.BookUpdateRequest">
+		UPDATE 
+			book
+		SET
+			book_title = #{bookTitle},
+			book_writer = #{bookWriter}
+		WHERE
+			book_no = #{bookNo}
+	</update>
+</mapper>

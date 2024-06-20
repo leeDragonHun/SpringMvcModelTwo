@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyh.practice1.mapper.BookImgMapper">
+	
+	<!-- img_no 컬럼의 값은 DB에서 AUTO_INCREMENT로 해두었다. 자동으로 insert될 것이다. -->
+	<insert id="insert" parameterType="com.lyh.practice1.dto.BookImg">
+		INSERT INTO book_img(
+			book_no,
+			img_name
+		) VALUES (
+			#{bookNo}, 
+			#{imgName} 
+		)
+	</insert>
+	
+	<!-- 원래사진삭제 -->
+	<delete id="originalImgDelete" parameterType="map">
+	 	DELETE
+	 	FROM
+	 		book_img 
+	 	WHERE 
+	 		book_no = #{bookNo}
+	</delete>
+	
+	<!-- 사진 이름 수정 -->
+	<update id="update" parameterType="com.lyh.practice1.dto.BookImg">
+		UPDATE
+			book_img
+		SET
+			img_name = #{imgName}
+		WHERE
+			book_no = #{bookNo}
+	</update>
+</mapper>
